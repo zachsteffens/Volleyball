@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Volleyball</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="drawer_open">Open drawer</string>
+    <string name="drawer_close">Close drawer</string>
+    <string name="title_activity_user_info_settings">UserInfoSettings</string>
+    <string name="title_activity_user_membership_info">UserMembershipInfo</string>
+
+    <!-- example strings for tabbed view demo -->
+    <string name="dummy_section_text">Section %1d is just a dummy section.</string>
+    <string name="demo_external_activity">Demo External Activity</string>
+    <string name="demo_collection">Demo Collection</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>
