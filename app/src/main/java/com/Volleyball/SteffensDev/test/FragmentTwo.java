@@ -1,6 +1,7 @@
 package com.Volleyball.SteffensDev.test;
 
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,8 +10,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-public class FragmentTwo   extends Fragment {
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
+
+
+public class FragmentTwo extends Fragment {
 
     ImageView ivIcon;
     TextView tvItemName;
@@ -37,5 +43,9 @@ public class FragmentTwo   extends Fragment {
                 getArguments().getInt(IMAGE_RESOURCE_ID)));
         return view;
     }
+
+
+
+
 
 }
