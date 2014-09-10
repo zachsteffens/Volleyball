@@ -2,6 +2,9 @@ package com.Volleyball.SteffensDev.test;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,7 +32,14 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -46,6 +56,10 @@ public class MainActivity extends FragmentActivity {
     private static final String PROPERTY_APP_VERSION = "appVersion";
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
+    //WCF Service endpoint
+    private final static String VOLLEYBALL_SERVICE_URI = "http://10.0.2.2/AndroidWCFService/VolleyballSvc.svc/GetUserInfo/?key=";
+
+
     /**
      * Substitute you own sender ID here. This is the project number you got
      * from the API Console, as described in "Getting Started."
@@ -57,6 +71,8 @@ public class MainActivity extends FragmentActivity {
      * Tag used on log messages.
      */
     static final String TAG = "GCMDemo";
+
+
 
     TextView mDisplay;
     GoogleCloudMessaging gcm;
@@ -100,6 +116,40 @@ public class MainActivity extends FragmentActivity {
 
         //end of setup for cloud messaging
 
+
+
+        //////////////testing notifications
+        // prepare intent which is triggered if the
+// notification is selected
+
+        /*Intent intent = new Intent(this, NotificationReceiver.class);
+        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);*/
+
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, MainActivity.class), 0);
+
+// build notification
+// the addAction re-use the same intent to keep the example short
+        Notification n  = new Notification.Builder(this)
+                .setContentTitle("New mail from " + "test@gmail.com")
+                .setContentText("Subject")
+                .setSmallIcon(R.drawable.ic_action_search)
+                .setContentIntent(contentIntent)
+                .setAutoCancel(true).build();
+                //.addAction(R.drawable.icon, "Call", pIntent)
+                //.addAction(R.drawable.icon, "More", pIntent)
+                //.addAction(R.drawable.icon, "And more", pIntent).build();
+
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        notificationManager.notify(0, n);
+
+
+
+
+        ///////////////end testing notifications
 
         // Initializing
         dataList = new ArrayList<DrawerItem>();
@@ -158,7 +208,60 @@ public class MainActivity extends FragmentActivity {
         }
 
 
-        ///////call echo server for push message
+
+        new AsyncTask<Void, Void, String> () {
+            @Override
+            protected String doInBackground(Void...params) {
+                DefaultHttpClient client = new DefaultHttpClient();
+
+                HttpGet request = new HttpGet(VOLLEYBALL_SERVICE_URI + "123456");
+
+                request.setHeader("Accept","application/json");
+                request.setHeader("Content-type", "application/json");
+
+                HttpEntity entity = null;
+                HttpResponse response = null;
+                try {
+                    response = client.execute(request);
+                    entity = response.getEntity();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if(entity.getContentLength() !=0){
+                    Reader VolleyballReader = null;
+                    try {
+                        VolleyballReader = new InputStreamReader(entity.getContent());
+
+                        char[] buffer = new char[(int) response.getEntity().getContentLength()];
+
+                        VolleyballReader.read(buffer);
+                        VolleyballReader.close();
+
+                        String result = new String(buffer);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+
+                }
+                return "sent message";
+            }
+
+            @Override
+            protected void onPostExecute(String msg) {
+                Toast.makeText(getApplicationContext(), msg,
+                        Toast.LENGTH_LONG).show();
+                //mDisplay.append(msg + "\n");
+            }
+
+        }.execute(null,null,null);
+
+
+
+        /*///////call echo server for push message
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
@@ -183,7 +286,7 @@ public class MainActivity extends FragmentActivity {
                         Toast.LENGTH_LONG).show();
                 //mDisplay.append(msg + "\n");
             }
-        }.execute(null, null, null);
+        }.execute(null, null, null);*/
 
 
     }
@@ -492,7 +595,7 @@ public class MainActivity extends FragmentActivity {
 
             @Override
             protected void onPostExecute(String msg) {
-                mDisplay.append(msg + "\n");
+                //mDisplay.append(msg + "\n");
             }
         }.execute(null, null, null);
     }
